@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>중2 기술 수업 - 기술의 특성 확인 퀴즈</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --success: #10B981;
+      --error: #EF4444;
+      --bg: #F3F4F6;
+      --card-bg: #FFFFFF;
+      --text: #1F2937;
+      --text-muted: #6B7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 650px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    /* Start Screen */
+    .start-screen {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .start-screen .intro-box {
+      background: #EEF2FF;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 25px;
+      text-align: left;
+    }
+
+    .intro-box h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .intro-box ul {
+      list-style-type: none;
+    }
+
+    .intro-box li {
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      width: 100%;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Quiz Screen */
+    .quiz-screen {
+      display: none;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      background-color: #E5E7EB;
+      height: 8px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .quiz-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .question-card {
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      background-color: white;
+      border: 2px solid #E5E7EB;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      background-color: #EEF2FF;
+    }
+
+    .option-btn.correct {
+      background-color: #D1FAE5 !important;
+      border-color: var(--success) !important;
+      color: #065F46 !important;
+    }
+
+    .option-btn.incorrect {
+      background-color: #FEE2E2 !important;
+      border-color: var(--error) !important;
+      color: #991B1B !important;
+    }
+
+    .explanation-box {
+      display: none;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .explanation-box.correct-box {
+      background-color: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+    }
+
+    .explanation-box.incorrect-box {
+      background-color: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      color: #991B1B;
+    }
+
+    .explanation-box h4 {
+      margin-bottom: 5px;
+      font-size: 0.95rem;
+    }
+
+    .next-btn {
+      display: none;
+    }
+
+    /* Result Screen */
+    .result-screen {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .score-badge {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 15px 0;
+    }
+
+    .zero-emoji {
+      font-size: 4.5rem;
+      margin: 15px 0;
+    }
+
+    .result-message {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .result-submessage {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 헤더 -->
+    <div class="header">
+      <h1>🛠️ 기술의 특성 확인 퀴즈</h1>
+      <p>중학교 2학년 기술 수업 - 첫 번째 시간</p>
+    </div>
+
+    <!-- 시작 화면 -->
+    <div id="startScreen" class="start-screen">
+      <div class="intro-box">
+        <h3>📌 학습 내용 요약</h3>
+        <ul>
+          <li><strong>• 생산성:</strong> 자원을 이용해 필요한 인공물 제작</li>
+          <li><strong>• 실용성:</strong> 생활을 편리하고 풍요롭게 해줌</li>
+          <li><strong>• 실천성:</strong> 지식을 바탕으로 문제를 직접 해결</li>
+          <li><strong>• 융합성:</strong> 다른 기술 및 영역(예술, 의학 등)과 결합</li>
+          <li><strong>• 상호작용성:</strong> 사회, 경제, 환경 등과 영향을 주고받음</li>
+        </ul>
+      </div>
+      <p style="margin-bottom: 20px; font-size: 0.9rem; color: #4B5563;">
+        총 <strong>7문제</strong>가 무작위로 출제됩니다.<br>제시된 예시를 읽고 올바른 기술의 특성을 맞춰보세요!
+      </p>
+      <button class="btn" onclick="startQuiz()">퀴즈 시작하기</button>
+    </div>
+
+    <!-- 퀴즈 화면 -->
+    <div id="quizScreen" class="quiz-screen">
+      <div class="progress-bar-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div class="quiz-meta">
+        <span id="questionNum">문제 1 / 7</span>
+        <span>기술의 특성 맞추기</span>
+      </div>
+
+      <div id="questionCard" class="question-card">
+        <!-- 문제 내용 삽입 영역 -->
+      </div>
+
+      <div id="optionsGrid" class="options-grid">
+        <!-- 보기 버튼 영역 -->
+      </div>
+
+      <div id="explanationBox" class="explanation-box">
+        <h4 id="explanationResult">정답입니다!</h4>
+        <p id="explanationText"></p>
+      </div>
+
+      <button id="nextBtn" class="btn next-btn" onclick="nextQuestion()">다음 문제로</button>
+    </div>
+
+    <!-- 결과 화면 -->
+    <div id="resultScreen" class="result-screen">
+      <div id="scoreDisplay"></div>
+      <div id="resultMessage" class="result-message"></div>
+      <div id="resultSubmessage" class="result-submessage"></div>
+      <button class="btn" onclick="restartQuiz()">다시 도전하기 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // 전체 데이터베이스 (10가지 주제별 5가지 특성 문제)
+    const database = [
+      {
+        topic: "스마트팜",
+        items: {
+          생산성: { text: "스마트팜은 작물, 물, 토양, 에너지 등의 자원과 센서·제어 장치를 활용하여 농작물을 생산한다.", exp: "자원과 제어 장치를 이용하여 필요한 농작물(인공물)을 만들어내므로 생산적 특성에 해당합니다." },
+          실용성: { text: "스마트팜은 온도와 습도 등을 자동으로 관리하여 농작물을 효율적으로 재배하고 농업인의 노동을 줄여준다.", exp: "농업인의 노동을 줄이고 효율을 높여 생활을 편리하고 풍요롭게 해주므로 실용적 특성에 해당합니다." },
+          실천성: { text: "스마트팜은 농업에 필요한 과학적 지식과 기술을 실제 농장에 적용하여 작물을 재배한다.", exp: "지식에 머무르지 않고 실제 농장에 직접 적용하여 문제를 해결하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "스마트팜은 농업 기술에 센서 기술, 정보통신기술, 인공지능, 자동제어 기술 등이 융합된다.", exp: "농업 기술에 ICT, AI, 센서 등 여러 영역의 기술이 결합했으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "스마트팜은 농촌의 인력 부족, 식량 문제, 농업 정책 및 소비자의 식품 수요 등에 영향을 받으며 발전한다.", exp: "사회적 문제, 정책, 소비자 수요 등 사회·경제적 요인과 영향을 주고받으므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "3D 프린터",
+        items: {
+          생산성: { text: "3D 프린터는 필라멘트 등의 재료를 이용하여 원하는 모양의 제품이나 부품을 만들어 낸다.", exp: "재료를 이용하여 필요한 제품이나 부품을 실제로 만들어 내므로 생산적 특성에 해당합니다." },
+          실용성: { text: "3D 프린터는 복잡한 모양의 제품도 비교적 쉽게 제작할 수 있어 제품 개발과 제작을 편리하게 한다.", exp: "제작 과정을 편리하고 효율적으로 만들어 생활 및 산업에 유용하므로 실용적 특성에 해당합니다." },
+          실천성: { text: "3D 프린터는 컴퓨터로 설계한 결과물을 실제 물체로 출력하여 문제 해결에 활용한다.", exp: "설계한 지식과 데이터를 실제 물체로 출력하여 문제를 직접 해결하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "3D 프린터는 컴퓨터 설계 기술, 재료 기술, 제조 기술, 정보통신기술 등이 융합된다.", exp: "설계, 재료, 제조, ICT 등 다양한 기술 분야가 결합되어 발전했으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "3D 프린터는 맞춤형 제품에 대한 수요가 증가하고 제조 방식이 변화하면서 산업과 일자리에도 영향을 미친다.", exp: "소비자 수요 변화 및 산업, 일자리 구조 등 사회 전체와 영향을 주고받으므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "태양광 발전 시스템",
+        items: {
+          생산성: { text: "태양광 발전 시스템은 태양의 빛에너지와 태양광 패널 등의 장치를 이용하여 전기에너지를 생산한다.", exp: "자연 자원과 장치를 이용하여 전기에너지라는 유용한 결과물을 만들어내므로 생산적 특성에 해당합니다." },
+          실용성: { text: "태양광 발전 시스템은 태양빛을 전기에너지로 바꾸어 가정이나 건물에서 필요한 전기를 사용할 수 있게 한다.", exp: "가정과 건물에서 필요한 전기를 직접 공급하여 삶을 편리하게 하므로 실용적 특성에 해당합니다." },
+          실천성: { text: "태양광 발전 시스템은 태양광 발전 원리를 실제 발전 시설에 적용하여 전기에너지를 생산한다.", exp: "과학적 원리나 지식을 실제 발전 시설에 적용하여 에너지를 만들어내므로 실천적 특성에 해당합니다." },
+          융합성: { text: "태양광 발전 시스템은 태양에너지에 대한 과학적 원리와 전기·전자 기술, 건설 기술, 에너지 저장 기술 등이 융합된다.", exp: "과학 원리와 전기, 전자, 건설 등 다양한 기술 분야가 합쳐졌으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "태양광 발전 시스템은 에너지 정책, 전력 요금, 환경 문제, 주민들의 인식 등에 영향을 받으며 발전한다.", exp: "정부 정책, 환경 이슈, 사회적 인식 등 외부 환경과 주고받는 관계에 있으므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "전기자동차",
+        items: {
+          생산성: { text: "전기자동차는 배터리, 전기 모터, 차체 등의 자원과 기술을 이용하여 이동 수단을 만든다.", exp: "부품과 자원을 활용해 이동 수단이라는 인공물을 만들어내므로 생산적 특성에 해당합니다." },
+          실용성: { text: "전기자동차는 전기를 동력으로 이용하여 자동차를 운행하고 배기가스 배출을 줄이는 데 도움을 준다.", exp: "편리한 이동을 돕고 배기가스를 줄여 생활환경을 풍요롭게 하므로 실용적 특성에 해당합니다." },
+          실천성: { text: "전기자동차는 전기 에너지와 모터에 관한 지식과 기술을 실제 자동차 제작과 운행에 적용한다.", exp: "전기와 모터에 관한 지식을 이론에 묵히지 않고 실제 운행에 적용하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "전기자동차는 자동차 기술, 배터리 기술, 전기·전자 기술, 정보통신기술 등이 융합된다.", exp: "기계적인 자동차 기술에 배터리, ICT 등 첨단 분야가 통합되었으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "전기자동차는 충전소 설치, 정부의 친환경 자동차 정책, 자동차 산업의 변화, 소비자의 구매 방식 등에 영향을 주고받는다.", exp: "인프라, 정부 정책, 산업 구조, 소비자 행태 등 사회 여러 요소와 영향을 주고받으므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "스마트폰",
+        items: {
+          생산성: { text: "스마트폰은 다양한 부품과 소재, 소프트웨어를 이용하여 통신과 정보 처리 기능을 갖춘 기기를 만든다.", exp: "여러 소재와 부품을 조합해 새로운 정보통신 기기를 생산하므로 생산적 특성에 해당합니다." },
+          실용성: { text: "스마트폰은 통화, 인터넷 검색, 사진 촬영, 결제 등 다양한 기능을 하나의 기기로 이용할 수 있어 생활을 편리하게 한다.", exp: "일상생활의 수많은 일을 기기 하나로 처리할 수 있게 해 생활을 매우 편리하게 하므로 실용적 특성에 해당합니다." },
+          실천성: { text: "스마트폰은 통신과 컴퓨터에 관한 지식과 기술을 실제 제품으로 구현하여 다양한 생활 문제를 해결한다.", exp: "통신 지식을 실제 제품으로 구현하여 일상의 소통과 정보 탐색 문제를 해결하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "스마트폰은 반도체, 통신, 컴퓨터, 카메라, 인공지능, 디자인 등의 기술이 융합된다.", exp: "하드웨어, 소프트웨어, AI, 디자인 등 다방면의 기술이 한곳에 결합되었으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "스마트폰의 보급은 사람들의 의사소통 방식, 소비 방식, 교육 및 사회생활 등에 변화를 가져온다.", exp: "기기의 보급이 인류의 문화, 사회, 경제적 소통 양식을 변화시키므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "드론 배송",
+        items: {
+          생산성: { text: "드론 배송은 드론의 기체, 배터리, 센서, 소프트웨어 등의 자원을 활용하여 물품을 운반하는 시스템을 만든다.", exp: "자원과 소프트웨어를 활용하여 운반 가능한 배송 시스템을 만들어내므로 생산적 특성에 해당합니다." },
+          실용성: { text: "드론 배송은 교통 상황의 영향을 적게 받으면서 물품을 빠르게 배송할 수 있어 배송의 편리성을 높인다.", exp: "기존 물류의 신속성과 편리함을 크게 향상해 주므로 실용적 특성에 해당합니다." },
+          실천성: { text: "드론 배송은 드론 비행 기술과 자동제어 기술을 실제 배송에 적용하여 물류 문제를 해결한다.", exp: "비행 제어 기술을 이론에 그치지 않고 물류 현장에서 실제 활용하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "드론 배송은 항공 기술, 배터리 기술, GPS, 인공지능, 정보통신기술 등이 융합된다.", exp: "항공, 로봇, GPS, AI, 통신 등 첨단 기술들이 다각도로 연계되었으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "드론 배송이 확대되면서 항공 관련 법규, 안전 기준, 배송 산업, 주민들의 생활환경 등에 변화가 나타난다.", exp: "법제도, 안전 규칙, 물류 산업 및 지역 사회 환경과 상호 영향을 주므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "인공 관절",
+        items: {
+          생산성: { text: "인공 관절은 금속, 세라믹, 특수 플라스틱 등의 재료와 의료 기술을 이용하여 인체의 관절을 대신할 인공물을 만든다.", exp: "재료와 기술을 활용해 신체를 대체할 인공물을 새로 만들어내므로 생산적 특성에 해당합니다." },
+          실용성: { text: "인공 관절은 손상된 관절의 기능을 보완하여 환자가 일상생활을 하는 데 도움을 준다.", exp: "환자의 통증을 줄이고 보행 등 일상생활을 가능케 도와주므로 실용적 특성에 해당합니다." },
+          실천성: { text: "인공 관절은 인체의 구조와 움직임에 대한 지식을 실제 의료기기 제작과 치료에 적용한다.", exp: "의학적/해부학적 지식을 바탕으로 실제 환자 치료 기구를 만들어 문제를 해결하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "인공 관절은 의학, 생명과학, 재료공학, 기계공학 등의 여러 분야가 융합된다.", exp: "의학적 지식에 재료, 기계, 생명공학 등 다양한 학문과 기술이 합쳐졌으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "인공 관절은 고령 인구 증가, 의료비, 의료 기술에 대한 사회적 요구 등이 인공 관절 기술의 발전에 영향을 준다.", exp: "고령화라는 사회적 변화와 의료 수요 등 시대적 배경과 밀접하게 연동되므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "스마트홈",
+        items: {
+          생산성: { text: "스마트홈은 센서, 통신 장치, 가전제품, 소프트웨어 등의 자원을 활용하여 가정에서 자동으로 작동하는 시스템을 만든다.", exp: "여러 구성 요소와 자원을 엮어서 작동하는 주거 시스템을 구축(생산)하므로 생산적 특성에 해당합니다." },
+          실용성: { text: "스마트홈은 조명, 냉난방, 보안 장치 등을 자동으로 조절하여 생활을 편리하고 효율적으로 만들어 준다.", exp: "주거 환경의 자동화를 통해 삶의 편의성과 효율성을 증대시키므로 실용적 특성에 해당합니다." },
+          실천성: { text: "스마트홈은 정보통신기술과 자동제어 기술을 실제 주거 공간에 적용하여 생활의 문제를 해결한다.", exp: "제어 기술을 실제 집이라는 현실 공간에 구현하여 주거 불편을 줄이므로 실천적 특성에 해당합니다." },
+          융합성: { text: "스마트홈은 주거 기술, 전기·전자 기술, 정보통신기술, 인공지능 등이 융합된다.", exp: "건축/주거 영역에 전기전자, ICT, AI 기술이 합쳐져 구현되므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "스마트홈은 1인 가구 증가, 고령화, 에너지 절약에 대한 관심 등 사회의 변화가 스마트홈 기술의 발전에 영향을 준다.", exp: "인구 구조 변화, 에너지 절약 의식 등 사회적 트렌드와 직결되므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "로봇 수술",
+        items: {
+          생산성: { text: "로봇 수술은 로봇의 부품, 센서, 소프트웨어 등의 자원을 활용하여 수술을 보조하는 의료 로봇을 만든다.", exp: "정밀 부품과 센서를 조합하여 의료용 로봇 장비를 생산하므로 생산적 특성에 해당합니다." },
+          실용성: { text: "로봇 수술은 의사의 수술을 정밀하게 보조하여 수술의 편의성과 정확성을 높이는 데 도움을 준다.", exp: "의료진의 수술 정확도와 편의성을 크게 높여주므로 실용적 특성에 해당합니다." },
+          실천성: { text: "로봇 수술은 로봇공학과 의학에 대한 지식을 실제 수술 과정에 적용하여 의료 문제를 해결한다.", exp: "공학 및 의학 지식을 실제 수술 현장에서 활용해 정밀 치료라는 문제를 해결하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "로봇 수술은 의학, 로봇공학, 인공지능, 정밀기계 기술, 정보통신기술 등이 융합된다.", exp: "의학과 로봇, AI, 정밀기계 분야가 하나로 정밀하게 융합되었으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "로봇 수술은 의료 기술에 대한 사회적 요구, 의료 제도, 의료비, 환자와 의료진의 인식 등이 기술의 발전과 활용에 영향을 준다.", exp: "의료 법제도, 비용, 사회적 수용도 등 사회적 요소와의 교류 속에서 발전하므로 상호작용적 특성에 해당합니다." }
+        }
+      },
+      {
+        topic: "해상풍력 발전",
+        items: {
+          생산성: { text: "해상풍력 발전은 바람의 운동에너지와 풍력 터빈 등의 시설을 이용하여 전기에너지를 생산한다.", exp: "바람 자원과 터빈 시설을 사용해 유용한 전기 에너지를 새로 만들어내므로 생산적 특성에 해당합니다." },
+          실용성: { text: "해상풍력 발전은 바람이라는 자연에너지를 전기에너지로 변환하여 전력 공급에 활용할 수 있다.", exp: "자연 에너지를 실제 삶에 필요한 유용한 전력 자원으로 바꾸어 활용하므로 실용적 특성에 해당합니다." },
+          실천성: { text: "해상풍력 발전은 풍력 발전의 원리와 기술을 실제 바다에 설치된 발전 시설에 적용하여 전기를 생산한다.", exp: "에너지 변환 원리를 실제 바다 위 발전소 건설 및 운영에 실천하므로 실천적 특성에 해당합니다." },
+          융합성: { text: "해상풍력 발전은 에너지 기술, 전기 기술, 기계 기술, 건설 기술, 해양 기술 등이 융합된다.", exp: "기계, 전기, 토목/건설, 해양 공학 등 다방면의 분야가 통합되었으므로 융합적 특성에 해당합니다." },
+          상호작용성: { text: "해상풍력 발전은 친환경 에너지 정책, 어업 활동, 해양 환경, 지역 주민의 의견 등 사회·경제·환경적 요인과 영향을 주고받는다.", exp: "지역 어민과의 이해관계, 환경 이슈, 정부 정책 등 사회적 조건들과 상호 작용하므로 상호작용적 특성에 해당합니다." }
+        }
+      }
+    ];
+
+    const characteristics = ["생산성", "실용성", "실천성", "융합성", "상호작용성"];
+
+    let currentQuestions = [];
+    let currentQuizIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    // 배열 셔플 함수
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    // 퀴즈 문제 생성 (주제 7개 무작위, 정답 특성 골고루 배분)
+    function generateQuestions() {
+      const selectedTopics = shuffle([...database]).slice(0, 7);
+      
+      // 5개 특성을 균등하게 배분 (5개 특성 + 무작위 2개 특성 = 총 7개)
+      let targetChars = [...characteristics, ...shuffle([...characteristics]).slice(0, 2)];
+      targetChars = shuffle(targetChars);
+
+      return selectedTopics.map((topicData, idx) => {
+        const correctChar = targetChars[idx];
+        const item = topicData.items[correctChar];
+        
+        return {
+          topic: topicData.topic,
+          questionText: `${item.text}`,
+          correctAnswer: correctChar,
+          explanation: item.exp
+        };
+      });
+    }
+
+    function startQuiz() {
+      currentQuestions = generateQuestions();
+      currentQuizIndex = 0;
+      score = 100; // 100점에서 시작
+      
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'none';
+      document.getElementById('quizScreen').style.display = 'block';
+      
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      answered = false;
+      const q = currentQuestions[currentQuizIndex];
+      
+      // 프로그레스 바 & 진행도
+      const progressPercent = ((currentQuizIndex + 1) / 7) * 100;
+      document.getElementById('progressBar').style.width = `${progressPercent}%`;
+      document.getElementById('questionNum').innerText = `문제 ${currentQuizIndex + 1} / 7`;
+
+      // 문제 카드 설정
+      document.getElementById('questionCard').innerHTML = `
+        <div style="font-size:0.85rem; color:#4F46E5; font-weight:700; margin-bottom:6px;">[예시: ${q.topic}]</div>
+        "${q.questionText}"<br><br>
+        <span style="font-size:0.95rem; color:#4B5563;">👉 위 설명은 기술의 특성 중 무엇에 해당할까요?</span>
+      `;
+
+      // 보기 생성
+      const optionsGrid = document.getElementById('optionsGrid');
+      optionsGrid.innerHTML = '';
+      
+      characteristics.forEach(char => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = `${char}`;
+        btn.onclick = () => selectOption(char, btn);
+        optionsGrid.appendChild(btn);
+      });
+
+      // 피드백 박스 & 다음 버튼 초기화
+      document.getElementById('explanationBox').style.display = 'none';
+      document.getElementById('nextBtn').style.display = 'none';
+    }
+
+    function selectOption(selectedChar, selectedBtn) {
+      if (answered) return;
+      answered = true;
+
+      const q = currentQuestions[currentQuizIndex];
+      const isCorrect = selectedChar === q.correctAnswer;
+      const optionBtns = document.querySelectorAll('.option-btn');
+
+      // 버튼 오버레이 비활성화
+      optionBtns.forEach(btn => btn.disabled = true);
+
+      // 정답/오답 표시
+      if (isCorrect) {
+        selectedBtn.classList.add('correct');
+      } else {
+        selectedBtn.classList.add('incorrect');
+        score -= 10; // 틀릴 때마다 10점 차감
+        
+        // 정답 버튼을 녹색으로 강조
+        optionBtns.forEach(btn => {
+          if (btn.innerText === q.correctAnswer) {
+            btn.classList.add('correct');
+          }
+        });
+      }
+
+      // 해설 박스 표시
+      const expBox = document.getElementById('explanationBox');
+      const expTitle = document.getElementById('explanationResult');
+      const expText = document.getElementById('explanationText');
+
+      expBox.style.display = 'block';
+      if (isCorrect) {
+        expBox.className = 'explanation-box correct-box';
+        expTitle.innerText = '⭕ 정답입니다!';
+      } else {
+        expBox.className = 'explanation-box incorrect-box';
+        expTitle.innerText = `❌ 아쉬워요! 정답은 [${q.correctAnswer}]입니다.`;
+      }
+      expText.innerText = q.explanation;
+
+      // 다음 버튼 활성화
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.style.display = 'block';
+      if (currentQuizIndex === 6) {
+        nextBtn.innerText = '최종 결과 확인하기 🎉';
+      } else {
+        nextBtn.innerText = '다음 문제로 ▶';
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuizIndex < 6) {
+        currentQuizIndex++;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      document.getElementById('quizScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'block';
+
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      const resultMessage = document.getElementById('resultMessage');
+      const resultSubmessage = document.getElementById('resultSubmessage');
+
+      const correctCount = (score - 30) / 10; // 100점=7개, 90점=6개 ... 30점=0개
+
+      if (correctCount === 0) {
+        // 0개 맞춘 경우
+        scoreDisplay.innerHTML = `<div class="zero-emoji">😭</div>`;
+        resultMessage.innerText = "괜찮아요! 다시 도전해보세요!";
+        resultSubmessage.innerText = "아직 기술의 특성이 익숙하지 않을 수 있어요.\n이론을 다시 한 번 읽어보고 도전하면 기술 천재가 될 수 있어요! 💪";
+      } else {
+        // 1개 이상 맞춘 경우
+        scoreDisplay.innerHTML = `<div class="score-badge">${score}<span style="font-size:2rem;">점</span></div>`;
+        
+        if (score === 100) {
+          resultMessage.innerText = "🏆 완벽해요! 완벽한 기술 천재!";
+          resultSubmessage.innerText = "기술의 5가지 특성을 완벽하게 이해하고 있군요! 참 잘했어요!";
+        } else if (score >= 80) {
+          resultMessage.innerText = "🌟 아주 훌륭하네요!";
+          resultSubmessage.innerText = "개념을 아주 잘 파악하고 있어요. 조금만 더 신경 쓰면 100점도 문제없어요!";
+        } else if (score >= 60) {
+          resultMessage.innerText = "👍 잘했어요! 조금만 더 힘내볼까요?";
+          resultSubmessage.innerText = "기술의 특성을 잘 이해하고 있네요. 틀린 내용을 복습해보세요!";
+        } else {
+          resultMessage.innerText = "🌱 조금만 더 노력하면 기술 천재가 될 수 있어요!";
+          resultSubmessage.innerText = "헷갈리는 특성들을 다시 한번 복습하고 재도전 해보세요! 응원합니다!";
+        }
+      }
+    }
+
+    function restartQuiz() {
+      startQuiz();
+    }
+  </script>
+</body>
+</html>
